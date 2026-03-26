@@ -87,10 +87,13 @@
       var section = document.createElement('section');
       section.className = 'page';
 
+      var pageContent = document.createElement('div');
+      pageContent.className = 'page-content';
+
       var h1 = document.createElement('h1');
       h1.className = 'label';
       h1.textContent = cat;
-      section.appendChild(h1);
+      pageContent.appendChild(h1);
 
       var nav = document.createElement('nav');
       grouped[cat].forEach(function (link) {
@@ -113,7 +116,8 @@
         nav.appendChild(wrapper);
       });
 
-      section.appendChild(nav);
+      pageContent.appendChild(nav);
+      section.appendChild(pageContent);
       carousel.appendChild(section);
     });
 
