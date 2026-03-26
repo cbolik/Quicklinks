@@ -180,6 +180,7 @@
     if (pages.length <= 1) return;
 
     var total = pages.length;
+    var wrapping = false;
 
     // Create a dots row inside each page, below the label
     var allDotSets = [];
@@ -193,14 +194,13 @@
           dot.className = 'dot' + (i === 0 ? ' active' : '');
           dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
           dot.addEventListener('click', function () {
-            carousel.scrollTo({ left: i * carousel.offsetWidth, behavior: 'smooth' });
+            scrollToPage(i);
           });
           dotsEl.appendChild(dot);
           dotSet.push(dot);
         })(i);
       }
       allDotSets.push(dotSet);
-      // Insert after the .label heading, before the nav
       var label = page.querySelector('.label');
       if (label) {
         label.parentNode.insertBefore(dotsEl, label.nextSibling);
@@ -208,7 +208,9 @@
     });
 
     function updateDots() {
+      if (wrapping) return;
       var index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+      if (index < 0 || index >= total) return;
       allDotSets.forEach(function (dotSet) {
         dotSet.forEach(function (dot, i) {
           dot.classList.toggle('active', i === index);
@@ -219,8 +221,60 @@
     currentScrollHandler = updateDots;
     carousel.addEventListener('scroll', currentScrollHandler);
 
+    function wrapRight() {
+      // Last → first: append clone of page 0, animate right to it, teleport back
+      wrapping = true;
+      var pageWidth = carousel.offsetWidth;
+      var clone = pages[0].cloneNode(true);
+      carousel.appendChild(clone);
+      carousel.scrollTo({ left: total * pageWidth, behavior: 'smooth' });
+      setTimeout(function () {
+        carousel.style.scrollSnapType = 'none';
+        carousel.scrollLeft = 0;
+        clone.remove();
+        carousel.style.scrollSnapType = '';
+        wrapping = false;
+        updateDots();
+      }, 400);
+    }
+
+    function wrapLeft() {
+      // First → last: prepend clone of last page, animate left to it, teleport to real last page
+      wrapping = true;
+      var pageWidth = carousel.offsetWidth;
+      var clone = pages[total - 1].cloneNode(true);
+      carousel.insertBefore(clone, pages[0]);
+      carousel.style.scrollSnapType = 'none';
+      carousel.scrollLeft = pageWidth; // keep pages[0] visible after prepend
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          carousel.style.scrollSnapType = '';
+          carousel.scrollTo({ left: 0, behavior: 'smooth' });
+          setTimeout(function () {
+            carousel.style.scrollSnapType = 'none';
+            carousel.scrollLeft = total * pageWidth; // jump to real last page (clone still present)
+            clone.remove();
+            carousel.scrollLeft = (total - 1) * pageWidth; // fix position after clone removal
+            carousel.style.scrollSnapType = '';
+            wrapping = false;
+            updateDots();
+          }, 400);
+        });
+      });
+    }
+
     function scrollToPage(idx) {
-      carousel.scrollTo({ left: idx * carousel.offsetWidth, behavior: 'smooth' });
+      if (wrapping) return;
+      var pageWidth = carousel.offsetWidth;
+      var cur = Math.round(carousel.scrollLeft / pageWidth);
+      if (idx === cur) return;
+      if (cur === total - 1 && idx === 0) {
+        wrapRight();
+      } else if (cur === 0 && idx === total - 1) {
+        wrapLeft();
+      } else {
+        carousel.scrollTo({ left: idx * pageWidth, behavior: 'smooth' });
+      }
     }
 
     if (arrowLeft) {
