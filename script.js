@@ -51,6 +51,9 @@
   var categoryList = document.getElementById('category-list');
   var cancelBtn = document.querySelector('.btn-cancel');
   var indicators = document.querySelector('.indicators');
+  var pageHeader = document.querySelector('.page-header');
+  var pageHeaderLabel = pageHeader.querySelector('.label');
+  var pageHeaderDots = pageHeader.querySelector('.page-header-dots');
 
   // Track handlers so we can remove them on re-render
   var currentScrollHandler = null;
@@ -66,6 +69,7 @@
     if (links.length === 0) {
       renderEmptyState();
       indicators.style.display = 'none';
+      pageHeader.classList.add('hidden');
       return;
     }
 
@@ -82,18 +86,16 @@
 
     indicators.style.display = categories.length > 1 ? '' : 'none';
 
+    pageHeader.classList.remove('hidden');
+
     // Render pages
     categories.forEach(function (cat) {
       var section = document.createElement('section');
       section.className = 'page';
+      section.setAttribute('data-category', cat);
 
       var pageContent = document.createElement('div');
       pageContent.className = 'page-content';
-
-      var h1 = document.createElement('h1');
-      h1.className = 'label';
-      h1.textContent = cat;
-      pageContent.appendChild(h1);
 
       var nav = document.createElement('nav');
       grouped[cat].forEach(function (link) {
@@ -122,11 +124,12 @@
     });
 
     applySpotifyRewriting();
-    initCarousel();
+    initCarousel(categories);
     wireDeleteHandlers();
   }
 
   function renderEmptyState() {
+    pageHeader.classList.add('hidden');
     var section = document.createElement('section');
     section.className = 'page';
 
@@ -168,7 +171,7 @@
   }
 
   // --- Carousel navigation ---
-  function initCarousel() {
+  function initCarousel(categories) {
     var pages = carousel.querySelectorAll('.page');
 
     // Clean up previous handlers
@@ -183,48 +186,42 @@
       carousel.removeEventListener('touchend', currentTouchEndHandler);
     }
 
+    // Populate fixed header with initial label and dots
+    pageHeaderLabel.textContent = categories[0] || '';
+    pageHeaderDots.innerHTML = '';
+
     if (pages.length <= 1) return;
 
     var total = pages.length;
     var wrapping = false;
 
-    // Create a dots row inside each page, below the label
-    var allDotSets = [];
-    pages.forEach(function (page) {
-      var dotsEl = document.createElement('div');
-      dotsEl.className = 'page-dots';
-      var dotSet = [];
-      for (var i = 0; i < total; i++) {
-        (function (i) {
-          var dot = document.createElement('button');
-          dot.className = 'dot' + (i === 0 ? ' active' : '');
-          dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
-          dot.addEventListener('click', function () {
-            scrollToPage(i);
-          });
-          dotsEl.appendChild(dot);
-          dotSet.push(dot);
-        })(i);
-      }
-      allDotSets.push(dotSet);
-      var label = page.querySelector('.label');
-      if (label) {
-        label.parentNode.insertBefore(dotsEl, label.nextSibling);
-      }
-    });
+    // Single set of dots in the fixed header
+    var dots = [];
+    for (var di = 0; di < total; di++) {
+      (function (i) {
+        var dot = document.createElement('button');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
+        dot.addEventListener('click', function () {
+          var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+          scrollToPage(i, i > cur ? 1 : -1);
+        });
+        pageHeaderDots.appendChild(dot);
+        dots.push(dot);
+      })(di);
+    }
 
-    function updateDots() {
+    function updateHeader() {
       if (wrapping) return;
       var index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
       if (index < 0 || index >= total) return;
-      allDotSets.forEach(function (dotSet) {
-        dotSet.forEach(function (dot, i) {
-          dot.classList.toggle('active', i === index);
-        });
+      pageHeaderLabel.textContent = categories[index];
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('active', i === index);
       });
     }
 
-    currentScrollHandler = updateDots;
+    currentScrollHandler = updateHeader;
     carousel.addEventListener('scroll', currentScrollHandler);
 
     // JS rAF animation: disables scroll-snap during wrap so browser can't fight the direction
@@ -258,7 +255,7 @@
         clone.remove();
         carousel.style.scrollSnapType = '';
         wrapping = false;
-        updateDots();
+        updateHeader();
       });
     }
 
@@ -268,25 +265,26 @@
       var pageWidth = carousel.offsetWidth;
       var clone = pages[total - 1].cloneNode(true);
       carousel.insertBefore(clone, pages[0]);
-      // smoothScroll sets scrollLeft = pageWidth first, keeping pages[0] in view
       smoothScroll(pageWidth, 0, function () {
-        carousel.scrollLeft = total * pageWidth; // real last page (clone still present)
+        carousel.scrollLeft = total * pageWidth;
         clone.remove();
-        carousel.scrollLeft = (total - 1) * pageWidth; // correct after removal
+        carousel.scrollLeft = (total - 1) * pageWidth;
         carousel.style.scrollSnapType = '';
         wrapping = false;
-        updateDots();
+        updateHeader();
       });
     }
 
-    function scrollToPage(idx) {
+    // dir: 1 = forward (right), -1 = backward (left)
+    function scrollToPage(idx, dir) {
       if (wrapping) return;
       var pageWidth = carousel.offsetWidth;
       var cur = Math.round(carousel.scrollLeft / pageWidth);
       if (idx === cur) return;
-      if (cur === total - 1 && idx === 0) {
+      var forward = dir > 0;
+      if (forward && cur === total - 1 && idx === 0) {
         wrapRight();
-      } else if (cur === 0 && idx === total - 1) {
+      } else if (!forward && cur === 0 && idx === total - 1) {
         wrapLeft();
       } else {
         carousel.scrollTo({ left: idx * pageWidth, behavior: 'smooth' });
@@ -296,13 +294,13 @@
     if (arrowLeft) {
       arrowLeft.onclick = function () {
         var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
-        scrollToPage((cur - 1 + total) % total);
+        scrollToPage((cur - 1 + total) % total, -1);
       };
     }
     if (arrowRight) {
       arrowRight.onclick = function () {
         var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
-        scrollToPage((cur + 1) % total);
+        scrollToPage((cur + 1) % total, 1);
       };
     }
 
@@ -310,9 +308,9 @@
       if (!dialogBackdrop.classList.contains('hidden')) return;
       var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
       if (e.key === 'ArrowLeft') {
-        scrollToPage((cur - 1 + total) % total);
+        scrollToPage((cur - 1 + total) % total, -1);
       } else if (e.key === 'ArrowRight') {
-        scrollToPage((cur + 1) % total);
+        scrollToPage((cur + 1) % total, 1);
       }
     };
     document.addEventListener('keydown', currentKeyHandler);

@@ -17,6 +17,33 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* --- Fixed page header --- */
+
+.page-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.page-header .label {
+  margin-bottom: 0.5rem;
+}
+
+.page-header-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  pointer-events: auto;
+  padding-bottom: 0.5rem;
+}
+
 /* --- Carousel layout --- */
 
 .carousel {
@@ -50,7 +77,7 @@ body {
   width: 100%;
   max-width: 480px;
   margin: auto 0;
-  padding: 2rem 0;
+  padding: 5rem 0 2rem; /* top pad clears the fixed header */
 }
 
 /* --- Typography --- */
@@ -158,14 +185,6 @@ nav {
   inset: 0;
   z-index: 10;
   pointer-events: none;
-}
-
-.page-dots {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.2rem;
 }
 
 .dot {
