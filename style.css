@@ -6,6 +6,8 @@
 
 html, body {
   height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -50,7 +52,8 @@ body {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  height: 100vh;
+  overscroll-behavior-x: none;
+  height: 100dvh;
   scrollbar-width: none;
 }
 
@@ -61,7 +64,7 @@ body {
 .page {
   flex: 0 0 100%;
   scroll-snap-align: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;

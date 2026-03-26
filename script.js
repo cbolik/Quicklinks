@@ -315,23 +315,92 @@
     };
     document.addEventListener('keydown', currentKeyHandler);
 
-    // Touch swipe wrap: detect swipe past edge on first/last page
-    var touchStartX = 0;
-    var touchStartPage = 0;
+    // Touch wrap: pre-place a clone before the swipe starts so there's real
+    // content past the edge — the native scroll handles it smoothly, then we
+    // teleport invisibly after the snap settles.
+    var cloneRight = null;
+    var cloneLeft = null;
+
+    function afterSnap(fn) {
+      var done = false;
+      function run() {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        carousel.removeEventListener('scrollend', run);
+        fn();
+      }
+      var timer = setTimeout(run, 500);
+      carousel.addEventListener('scrollend', run, { once: true });
+    }
+
     currentTouchStartHandler = function (e) {
-      touchStartX = e.touches[0].clientX;
-      touchStartPage = Math.round(carousel.scrollLeft / carousel.offsetWidth);
-    };
-    currentTouchEndHandler = function (e) {
-      if (wrapping) return;
-      var dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) < 30) return;
-      if (dx < 0 && touchStartPage === total - 1) {
-        wrapRight();
-      } else if (dx > 0 && touchStartPage === 0) {
-        wrapLeft();
+      if (wrapping || cloneRight || cloneLeft) return;
+      var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+      var pageWidth = carousel.offsetWidth;
+
+      if (cur === total - 1) {
+        // Append clone of first page — user can now swipe left to it naturally
+        cloneRight = pages[0].cloneNode(true);
+        cloneRight.style.pointerEvents = 'none';
+        carousel.appendChild(cloneRight);
+      } else if (cur === 0) {
+        // Prepend clone of last page — scroll anchoring keeps page 0 in view
+        cloneLeft = pages[total - 1].cloneNode(true);
+        cloneLeft.style.pointerEvents = 'none';
+        carousel.insertBefore(cloneLeft, pages[0]);
+        // Fallback if scroll anchoring didn't adjust position
+        if (carousel.scrollLeft === 0) {
+          carousel.scrollLeft = pageWidth;
+        }
       }
     };
+
+    currentTouchEndHandler = function () {
+      if (wrapping) return;
+      if (!cloneRight && !cloneLeft) return;
+
+      afterSnap(function () {
+        var pageWidth = carousel.offsetWidth;
+        wrapping = true;
+
+        if (cloneRight) {
+          if (Math.round(carousel.scrollLeft / pageWidth) >= total) {
+            // Reached clone → invisible teleport to real page 0
+            carousel.style.scrollSnapType = 'none';
+            carousel.scrollLeft = 0;
+            cloneRight.remove();
+            carousel.style.scrollSnapType = '';
+          } else {
+            cloneRight.remove();
+          }
+          cloneRight = null;
+        }
+
+        if (cloneLeft) {
+          if (Math.round(carousel.scrollLeft / pageWidth) === 0) {
+            // Reached clone → teleport to real last page
+            carousel.style.scrollSnapType = 'none';
+            carousel.scrollLeft = total * pageWidth;
+            cloneLeft.remove();
+            carousel.scrollLeft = (total - 1) * pageWidth;
+            carousel.style.scrollSnapType = '';
+          } else {
+            // Stayed on same/other page — remove clone and correct position
+            var realPage = Math.round(carousel.scrollLeft / pageWidth) - 1;
+            carousel.style.scrollSnapType = 'none';
+            cloneLeft.remove();
+            carousel.scrollLeft = Math.max(0, realPage) * pageWidth;
+            carousel.style.scrollSnapType = '';
+          }
+          cloneLeft = null;
+        }
+
+        wrapping = false;
+        updateHeader();
+      });
+    };
+
     carousel.addEventListener('touchstart', currentTouchStartHandler, { passive: true });
     carousel.addEventListener('touchend', currentTouchEndHandler, { passive: true });
   }
