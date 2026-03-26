@@ -6,8 +6,6 @@ Originally built for Spotify playlists, but works with any deep link: Spotify, A
 
 **[Live demo](https://cbolik.github.io/Quicklinks/)**
 
-![Quicklinks screenshot](docs/screenshot.png)
-
 ---
 
 ## What it does
@@ -51,12 +49,14 @@ Quicklinks accepts any URL or URI. Some useful formats:
 | Spotify album | `spotify:album:40EyFvLYo0Gesi6wRP8SMo` |
 | Spotify track | `spotify:track:4uLU6hMCjMI75M1A2tKUQC` |
 | Apple Podcasts show | `https://podcasts.apple.com/podcast/id12345` |
-| Calm meditation | `calm://` (or the deep link from the app) |
+| Calm session | `https://www.calm.com/...` |
 | Any website | `https://example.com` |
 
-### Spotify links on iOS
+On iOS, standard `https://` links to supported apps (Spotify, Podcasts, Calm, YouTube, etc.) open directly in the app via universal links — no custom URL schemes needed.
 
-On iOS/iPadOS, `spotify:` URIs are automatically rewritten to `https://open.spotify.com/...` universal links, which open Spotify directly without a prompt. On macOS, the native URI is used with an 800ms fallback to the web player.
+### Spotify links on macOS
+
+On macOS, `spotify:` URIs are used directly with an 800ms fallback to the web player if the desktop app doesn't respond.
 
 ---
 
