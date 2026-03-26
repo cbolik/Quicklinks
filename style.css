@@ -17,11 +17,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* --- Carousel layout --- */
+
 .carousel {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
   height: 100vh;
   scrollbar-width: none;
 }
@@ -42,6 +43,8 @@ body {
   overflow-y: auto;
 }
 
+/* --- Typography --- */
+
 .label {
   font-size: 0.8rem;
   font-weight: 400;
@@ -55,10 +58,22 @@ nav {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  max-width: 480px;
 }
 
-nav a {
+/* --- Link wrapper (for delete support) --- */
+
+.link-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.link-content {
   display: block;
+  position: relative;
+  z-index: 1;
   font-size: clamp(1.5rem, 6vw, 1.9rem);
   font-weight: 300;
   line-height: 2.2;
@@ -67,16 +82,66 @@ nav a {
   text-align: center;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.15s ease;
+  background-color: #0d0d0d;
 }
 
-nav a:hover,
-nav a:focus-visible {
+.link-content:hover,
+.link-content:focus-visible {
   color: #1ed760;
 }
 
-nav a:active {
+.link-content:active {
   color: rgba(29, 185, 84, 0.55);
 }
+
+/* --- Delete button --- */
+
+.delete-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Touch devices: red "Delete" behind swipe */
+@media (hover: none) {
+  .delete-btn {
+    width: 80px;
+    padding: 0 1rem;
+  }
+}
+
+/* Desktop: small X on hover */
+@media (hover: hover) {
+  .delete-btn {
+    width: 2rem;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    z-index: 2;
+  }
+
+  .link-wrapper:hover .delete-btn {
+    opacity: 1;
+  }
+
+  .delete-btn:hover {
+    color: #e74c3c;
+  }
+}
+
+/* --- Indicators --- */
 
 .indicators {
   position: fixed;
@@ -134,4 +199,157 @@ nav a:active {
   .arrow:hover {
     color: rgba(255, 255, 255, 0.6);
   }
+}
+
+/* --- Floating add button --- */
+
+.fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1DB954;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab:hover {
+  background: #1ed760;
+}
+
+/* --- Dialog --- */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 1rem;
+}
+
+.dialog-backdrop.hidden {
+  display: none;
+}
+
+.dialog {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 360px;
+}
+
+.dialog-title {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  margin-bottom: 0.8rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.form-group input:focus {
+  border-color: #1DB954;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+}
+
+.btn-cancel:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-add {
+  background: #1DB954;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 1.2rem;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.btn-add:hover {
+  background: #1ed760;
+}
+
+/* --- Empty state --- */
+
+.empty-message {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+}
+
+.empty-add-btn {
+  background: none;
+  border: 1px solid #1DB954;
+  color: #1DB954;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.6rem 1.4rem;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.empty-add-btn:hover {
+  background: #1DB954;
+  color: white;
+}
+
+/* --- Utility --- */
+
+.hidden {
+  display: none !important;
 }
