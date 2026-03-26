@@ -160,15 +160,12 @@ nav {
   pointer-events: none;
 }
 
-.dots {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
+.page-dots {
   display: flex;
   gap: 8px;
   align-items: center;
-  pointer-events: auto;
+  justify-content: center;
+  margin-bottom: 1.2rem;
 }
 
 .dot {

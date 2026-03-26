@@ -40,7 +40,6 @@
 
   // --- DOM references ---
   var carousel = document.querySelector('.carousel');
-  var dotsContainer = document.querySelector('.dots');
   var arrowLeft = document.querySelector('.arrow-left');
   var arrowRight = document.querySelector('.arrow-right');
   var fab = document.querySelector('.fab');
@@ -61,15 +60,12 @@
   function render() {
     var links = loadLinks();
     carousel.innerHTML = '';
-    dotsContainer.innerHTML = '';
 
     if (links.length === 0) {
       renderEmptyState();
       indicators.style.display = 'none';
       return;
     }
-
-    indicators.style.display = '';
 
     // Group by category, preserving first-seen order
     var categories = [];
@@ -81,6 +77,8 @@
       }
       grouped[link.category].push(link);
     });
+
+    indicators.style.display = categories.length > 1 ? '' : 'none';
 
     // Render pages
     categories.forEach(function (cat) {
@@ -170,7 +168,6 @@
   // --- Carousel navigation ---
   function initCarousel() {
     var pages = carousel.querySelectorAll('.page');
-    dotsContainer.innerHTML = '';
 
     // Clean up previous handlers
     if (currentScrollHandler) {
@@ -182,43 +179,70 @@
 
     if (pages.length <= 1) return;
 
-    pages.forEach(function (_, i) {
-      var dot = document.createElement('button');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
-      dot.addEventListener('click', function () {
-        carousel.scrollTo({ left: i * carousel.offsetWidth, behavior: 'smooth' });
-      });
-      dotsContainer.appendChild(dot);
+    var total = pages.length;
+
+    // Create a dots row inside each page, below the label
+    var allDotSets = [];
+    pages.forEach(function (page) {
+      var dotsEl = document.createElement('div');
+      dotsEl.className = 'page-dots';
+      var dotSet = [];
+      for (var i = 0; i < total; i++) {
+        (function (i) {
+          var dot = document.createElement('button');
+          dot.className = 'dot' + (i === 0 ? ' active' : '');
+          dot.setAttribute('aria-label', 'Go to page ' + (i + 1));
+          dot.addEventListener('click', function () {
+            carousel.scrollTo({ left: i * carousel.offsetWidth, behavior: 'smooth' });
+          });
+          dotsEl.appendChild(dot);
+          dotSet.push(dot);
+        })(i);
+      }
+      allDotSets.push(dotSet);
+      // Insert after the .label heading, before the nav
+      var label = page.querySelector('.label');
+      if (label) {
+        label.parentNode.insertBefore(dotsEl, label.nextSibling);
+      }
     });
 
-    var dots = dotsContainer.querySelectorAll('.dot');
-
-    currentScrollHandler = function () {
+    function updateDots() {
       var index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
-      dots.forEach(function (dot, i) {
-        dot.classList.toggle('active', i === index);
+      allDotSets.forEach(function (dotSet) {
+        dotSet.forEach(function (dot, i) {
+          dot.classList.toggle('active', i === index);
+        });
       });
-    };
+    }
+
+    currentScrollHandler = updateDots;
     carousel.addEventListener('scroll', currentScrollHandler);
+
+    function scrollToPage(idx) {
+      carousel.scrollTo({ left: idx * carousel.offsetWidth, behavior: 'smooth' });
+    }
 
     if (arrowLeft) {
       arrowLeft.onclick = function () {
-        carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+        var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+        scrollToPage((cur - 1 + total) % total);
       };
     }
     if (arrowRight) {
       arrowRight.onclick = function () {
-        carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+        var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+        scrollToPage((cur + 1) % total);
       };
     }
 
     currentKeyHandler = function (e) {
       if (!dialogBackdrop.classList.contains('hidden')) return;
+      var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
       if (e.key === 'ArrowLeft') {
-        carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+        scrollToPage((cur - 1 + total) % total);
       } else if (e.key === 'ArrowRight') {
-        carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+        scrollToPage((cur + 1) % total);
       }
     };
     document.addEventListener('keydown', currentKeyHandler);
