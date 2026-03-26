@@ -59,6 +59,7 @@
   var currentScrollHandler = null;
   var currentKeyHandler = null;
   var currentTouchStartHandler = null;
+  var currentTouchMoveHandler = null;
   var currentTouchEndHandler = null;
 
   // --- Render pipeline ---
@@ -183,6 +184,7 @@
     }
     if (currentTouchStartHandler) {
       carousel.removeEventListener('touchstart', currentTouchStartHandler);
+      carousel.removeEventListener('touchmove', currentTouchMoveHandler);
       carousel.removeEventListener('touchend', currentTouchEndHandler);
     }
 
@@ -334,22 +336,37 @@
       carousel.addEventListener('scrollend', run, { once: true });
     }
 
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var clonePlaced = false;
+
     currentTouchStartHandler = function (e) {
       if (wrapping || cloneRight || cloneLeft) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      clonePlaced = false;
+    };
+
+    currentTouchMoveHandler = function (e) {
+      if (wrapping || clonePlaced || cloneRight || cloneLeft) return;
+      var dx = e.touches[0].clientX - touchStartX;
+      var dy = e.touches[0].clientY - touchStartY;
+      // Only act on clear horizontal swipes (>8px horizontal, more horizontal than vertical)
+      if (Math.abs(dx) < 8 || Math.abs(dy) > Math.abs(dx)) return;
       var cur = Math.round(carousel.scrollLeft / carousel.offsetWidth);
       var pageWidth = carousel.offsetWidth;
+      clonePlaced = true;
 
-      if (cur === total - 1) {
-        // Append clone of first page — user can now swipe left to it naturally
+      if (dx < 0 && cur === total - 1) {
+        // Swiping left on last page — append clone of first page
         cloneRight = pages[0].cloneNode(true);
         cloneRight.style.pointerEvents = 'none';
         carousel.appendChild(cloneRight);
-      } else if (cur === 0) {
-        // Prepend clone of last page — scroll anchoring keeps page 0 in view
+      } else if (dx > 0 && cur === 0) {
+        // Swiping right on first page — prepend clone of last page
         cloneLeft = pages[total - 1].cloneNode(true);
         cloneLeft.style.pointerEvents = 'none';
         carousel.insertBefore(cloneLeft, pages[0]);
-        // Fallback if scroll anchoring didn't adjust position
         if (carousel.scrollLeft === 0) {
           carousel.scrollLeft = pageWidth;
         }
@@ -402,6 +419,7 @@
     };
 
     carousel.addEventListener('touchstart', currentTouchStartHandler, { passive: true });
+    carousel.addEventListener('touchmove', currentTouchMoveHandler, { passive: true });
     carousel.addEventListener('touchend', currentTouchEndHandler, { passive: true });
   }
 
