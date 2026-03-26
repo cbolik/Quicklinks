@@ -52,9 +52,11 @@
   var cancelBtn = document.querySelector('.btn-cancel');
   var indicators = document.querySelector('.indicators');
 
-  // Track scroll handler so we can remove it on re-render
+  // Track handlers so we can remove them on re-render
   var currentScrollHandler = null;
   var currentKeyHandler = null;
+  var currentTouchStartHandler = null;
+  var currentTouchEndHandler = null;
 
   // --- Render pipeline ---
   function render() {
@@ -176,6 +178,10 @@
     if (currentKeyHandler) {
       document.removeEventListener('keydown', currentKeyHandler);
     }
+    if (currentTouchStartHandler) {
+      carousel.removeEventListener('touchstart', currentTouchStartHandler);
+      carousel.removeEventListener('touchend', currentTouchEndHandler);
+    }
 
     if (pages.length <= 1) return;
 
@@ -221,45 +227,55 @@
     currentScrollHandler = updateDots;
     carousel.addEventListener('scroll', currentScrollHandler);
 
+    // JS rAF animation: disables scroll-snap during wrap so browser can't fight the direction
+    function smoothScroll(from, to, cb) {
+      var duration = 350;
+      var start = null;
+      carousel.style.scrollSnapType = 'none';
+      carousel.scrollLeft = from;
+      requestAnimationFrame(function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / duration, 1);
+        var ease = p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2, 3)/2;
+        carousel.scrollLeft = from + (to - from) * ease;
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          carousel.scrollLeft = to;
+          cb();
+        }
+      });
+    }
+
     function wrapRight() {
-      // Last → first: append clone of page 0, animate right to it, teleport back
+      // Last → first: append clone of page 0, animate right, teleport back
       wrapping = true;
       var pageWidth = carousel.offsetWidth;
       var clone = pages[0].cloneNode(true);
       carousel.appendChild(clone);
-      carousel.scrollTo({ left: total * pageWidth, behavior: 'smooth' });
-      setTimeout(function () {
-        carousel.style.scrollSnapType = 'none';
+      smoothScroll((total - 1) * pageWidth, total * pageWidth, function () {
         carousel.scrollLeft = 0;
         clone.remove();
         carousel.style.scrollSnapType = '';
         wrapping = false;
         updateDots();
-      }, 400);
+      });
     }
 
     function wrapLeft() {
-      // First → last: prepend clone of last page, animate left to it, teleport to real last page
+      // First → last: prepend clone of last page, animate left, teleport to real last page
       wrapping = true;
       var pageWidth = carousel.offsetWidth;
       var clone = pages[total - 1].cloneNode(true);
       carousel.insertBefore(clone, pages[0]);
-      carousel.style.scrollSnapType = 'none';
-      carousel.scrollLeft = pageWidth; // keep pages[0] visible after prepend
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          carousel.style.scrollSnapType = '';
-          carousel.scrollTo({ left: 0, behavior: 'smooth' });
-          setTimeout(function () {
-            carousel.style.scrollSnapType = 'none';
-            carousel.scrollLeft = total * pageWidth; // jump to real last page (clone still present)
-            clone.remove();
-            carousel.scrollLeft = (total - 1) * pageWidth; // fix position after clone removal
-            carousel.style.scrollSnapType = '';
-            wrapping = false;
-            updateDots();
-          }, 400);
-        });
+      // smoothScroll sets scrollLeft = pageWidth first, keeping pages[0] in view
+      smoothScroll(pageWidth, 0, function () {
+        carousel.scrollLeft = total * pageWidth; // real last page (clone still present)
+        clone.remove();
+        carousel.scrollLeft = (total - 1) * pageWidth; // correct after removal
+        carousel.style.scrollSnapType = '';
+        wrapping = false;
+        updateDots();
       });
     }
 
@@ -300,6 +316,26 @@
       }
     };
     document.addEventListener('keydown', currentKeyHandler);
+
+    // Touch swipe wrap: detect swipe past edge on first/last page
+    var touchStartX = 0;
+    var touchStartPage = 0;
+    currentTouchStartHandler = function (e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartPage = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+    };
+    currentTouchEndHandler = function (e) {
+      if (wrapping) return;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) < 30) return;
+      if (dx < 0 && touchStartPage === total - 1) {
+        wrapRight();
+      } else if (dx > 0 && touchStartPage === 0) {
+        wrapLeft();
+      }
+    };
+    carousel.addEventListener('touchstart', currentTouchStartHandler, { passive: true });
+    carousel.addEventListener('touchend', currentTouchEndHandler, { passive: true });
   }
 
   // --- Delete handling ---
