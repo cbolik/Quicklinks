@@ -66,12 +66,18 @@ const closeMenu = () => menuDropdown.classList.add('hidden');
 
 const exportLinks = async () => {
   const json = JSON.stringify(loadLinks(), null, 2);
-  const file = new File([json], 'quicklinks-export.json', { type: 'application/json' });
 
-  // Use native share sheet on iOS (saves to Files/iCloud, AirDrop, etc.)
-  if (navigator.canShare?.({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: 'Quicklinks Export' }); } catch { /* dismissed */ }
-    return;
+  // Try Web Share API (iOS native share sheet — Save to Files, AirDrop, etc.)
+  // Skip canShare() check: its file-type whitelist excludes JSON on some iOS versions.
+  if (navigator.share) {
+    try {
+      const file = new File([json], 'quicklinks-export.json', { type: 'application/json' });
+      await navigator.share({ files: [file], title: 'Quicklinks Export' });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return; // user dismissed — nothing to do
+      // Any other error: fall through to download
+    }
   }
 
   // Desktop fallback: trigger a file download
