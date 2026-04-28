@@ -18,23 +18,45 @@ const deriveHttpsUrl = (uri) => {
     : null;
 };
 
+const deriveSpotifyUri = (url) => {
+  const m = url.match(/^https:\/\/open\.spotify\.com\/(playlist|track|album|artist|show|episode)\/([^?/]+)/);
+  return m ? `spotify:${m[1]}:${m[2]}` : null;
+};
+
+// On macOS, attach a click handler that tries the spotify: URI first,
+// falling back to the https:// URL if the desktop app doesn't respond.
+const attachMacSpotifyHandler = (a, uri, fallbackUrl) => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const timer = setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+    window.addEventListener('blur', () => clearTimeout(timer), { once: true });
+    window.location.href = uri;
+  });
+};
+
 const applySpotifyRewriting = () => {
+  // spotify: URIs — rewrite to https on iOS/other; attach mac handler on macOS
   carousel.querySelectorAll('a[href^="spotify:"]').forEach(a => {
+    const uri = a.getAttribute('href');
+    const url = deriveHttpsUrl(uri);
+    if (!url) return;
     if (!isMac) {
-      const url = deriveHttpsUrl(a.getAttribute('href'));
-      if (url) a.setAttribute('href', url);
+      a.setAttribute('href', url);
     } else {
-      a.addEventListener('click', (e) => {
-        const uri = a.getAttribute('href');
-        const url = deriveHttpsUrl(uri);
-        if (!url) return;
-        e.preventDefault();
-        const timer = setTimeout(() => { window.location.href = url; }, 800);
-        window.addEventListener('blur', () => clearTimeout(timer), { once: true });
-        window.location.href = uri;
-      });
+      attachMacSpotifyHandler(a, uri, url);
     }
   });
+
+  // https://open.spotify.com/ URLs — on macOS only, redirect via spotify: URI
+  // so the desktop app opens instead of the web player. Leave untouched on iOS
+  // (universal links already open the app).
+  if (isMac) {
+    carousel.querySelectorAll('a[href^="https://open.spotify.com/"]').forEach(a => {
+      const uri = deriveSpotifyUri(a.getAttribute('href'));
+      const url = a.getAttribute('href');
+      if (uri) attachMacSpotifyHandler(a, uri, url);
+    });
+  }
 };
 
 // --- DOM references ---
