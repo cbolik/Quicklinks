@@ -1,0 +1,203 @@
+/* --- Carousel indicators --- */
+
+.indicators {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dot.active {
+  background: #1DB954;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.75rem 0.5rem;
+  line-height: 1;
+  display: none;
+  pointer-events: auto;
+}
+
+.arrow-left {
+  left: 0.25rem;
+}
+
+.arrow-right {
+  right: 0.25rem;
+}
+
+@media (hover: hover) {
+  .arrow {
+    display: block;
+  }
+
+  .arrow:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* --- Floating add button --- */
+
+.fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1DB954;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab:hover {
+  background: #1ed760;
+}
+
+/* --- Dialog --- */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 1rem;
+}
+
+.dialog-backdrop.hidden {
+  display: none;
+}
+
+.dialog {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 360px;
+}
+
+.dialog-title {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  margin-bottom: 0.8rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.form-group input:focus {
+  border-color: #1DB954;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+}
+
+.btn-cancel:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-add {
+  background: #1DB954;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 1.2rem;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.btn-add:hover {
+  background: #1ed760;
+}
+
+/* --- Empty state --- */
+
+.empty-message {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+}
+
+.empty-add-btn {
+  background: none;
+  border: 1px solid #1DB954;
+  color: #1DB954;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.6rem 1.4rem;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.empty-add-btn:hover {
+  background: #1DB954;
+  color: white;
+}

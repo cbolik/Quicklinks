@@ -1,0 +1,88 @@
+<h2>Carousel Page Structure</h2>
+<p class="subtitle">How pages sit side-by-side — only one visible at a time, swipe to navigate</p>
+
+<div class="section">
+  <h3>Page Layout</h3>
+  <p class="subtitle">Three pages in a horizontal scroll-snap container</p>
+  <div style="background: #0d0d0d; border-radius: 8px; padding: 1.5rem; overflow: hidden; margin-top: 1rem;">
+    <div style="display: flex; gap: 2px;">
+      <div style="flex: 0 0 40%; text-align: center; padding: 1rem; border: 1px solid rgba(29,185,84,0.3); border-radius: 6px;">
+        <p style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); margin-bottom: 0.6rem;">PLAYLISTS</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Current Tracks</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Individual Songs</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">The Maybe List</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Mellow</p>
+      </div>
+      <div style="flex: 0 0 40%; text-align: center; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; opacity: 0.5;">
+        <p style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); margin-bottom: 0.6rem;">ALBUMS</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Abbey Road</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Kind of Blue</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">OK Computer</p>
+      </div>
+      <div style="flex: 0 0 20%; text-align: center; padding: 1rem; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; opacity: 0.25;">
+        <p style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); margin-bottom: 0.6rem;">SHOWS</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Huberman Lab</p>
+        <p style="color: #1DB954; font-size: 0.75rem; line-height: 1.8; margin: 0;">Lex Fridman</p>
+      </div>
+    </div>
+    <p style="text-align: center; color: rgba(255,255,255,0.2); font-size: 0.6rem; margin-top: 0.8rem;">viewport shows one page at a time &mdash; swipe or click arrows to move</p>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Mobile Navigation</h3>
+  <p class="subtitle">Swipe between pages + dot indicators at the bottom</p>
+  <div style="background: #0d0d0d; border-radius: 8px; padding: 2rem 1rem; text-align: center; margin-top: 1rem; max-width: 280px; margin-left: auto; margin-right: auto;">
+    <p style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); margin-bottom: 0.8rem;">PLAYLISTS</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Current Tracks</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Individual Songs</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">The Maybe List</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Mellow</p>
+    <div style="margin-top: 1.5rem; display: flex; gap: 8px; justify-content: center; align-items: center;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1DB954;"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+    </div>
+    <p style="color: rgba(255,255,255,0.15); font-size: 0.5rem; margin-top: 0.4rem;">swipe left / right</p>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Desktop Navigation</h3>
+  <p class="subtitle">Same dots + left/right arrow buttons</p>
+  <div style="background: #0d0d0d; border-radius: 8px; padding: 2rem 1rem; text-align: center; margin-top: 1rem; max-width: 400px; margin-left: auto; margin-right: auto; position: relative;">
+    <p style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); margin-bottom: 0.8rem;">PLAYLISTS</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Current Tracks</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Individual Songs</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">The Maybe List</p>
+    <p style="color: #1DB954; font-size: 0.8rem; line-height: 2.2; margin: 0;">Mellow</p>
+    <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.3); font-size: 1.5rem;">&lsaquo;</span>
+    <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.3); font-size: 1.5rem;">&rsaquo;</span>
+    <div style="margin-top: 1.5rem; display: flex; gap: 8px; justify-content: center; align-items: center;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1DB954;"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25);"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>HTML Structure</h3>
+  <p class="subtitle">Each page is a section inside a scroll-snap container</p>
+  <div style="background: #1a1a2e; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-family: monospace; font-size: 0.7rem; line-height: 1.7; color: rgba(255,255,255,0.7);">
+    <p style="margin:0;color:#888;">&lt;div class="<span style="color:#6db;">carousel</span>"&gt;</p>
+    <p style="margin:0;padding-left:1rem;color:#888;">&lt;section class="<span style="color:#6db;">page</span>"&gt;</p>
+    <p style="margin:0;padding-left:2rem;color:#888;">&lt;h1 class="label"&gt;<span style="color:#aaa;">Playlists</span>&lt;/h1&gt;</p>
+    <p style="margin:0;padding-left:2rem;color:#888;">&lt;nav&gt; <span style="color:#aaa;">...links...</span> &lt;/nav&gt;</p>
+    <p style="margin:0;padding-left:1rem;color:#888;">&lt;/section&gt;</p>
+    <p style="margin:0;padding-left:1rem;color:#888;">&lt;section class="<span style="color:#6db;">page</span>"&gt;</p>
+    <p style="margin:0;padding-left:2rem;color:#888;">&lt;h1 class="label"&gt;<span style="color:#aaa;">Albums</span>&lt;/h1&gt;</p>
+    <p style="margin:0;padding-left:2rem;color:#888;">&lt;nav&gt; <span style="color:#aaa;">...links...</span> &lt;/nav&gt;</p>
+    <p style="margin:0;padding-left:1rem;color:#888;">&lt;/section&gt;</p>
+    <p style="margin:0;padding-left:1rem;color:#888;">&lt;section class="<span style="color:#6db;">page</span>"&gt; <span style="color:#aaa;">...more pages...</span> &lt;/section&gt;</p>
+    <p style="margin:0;color:#888;">&lt;/div&gt;</p>
+    <p style="margin:0;color:#888;">&lt;div class="<span style="color:#6db;">indicators</span>"&gt; <span style="color:#aaa;">dots + arrows</span> &lt;/div&gt;</p>
+  </div>
+</div>

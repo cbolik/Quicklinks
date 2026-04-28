@@ -1,0 +1,38 @@
+/* --- Carousel --- */
+
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: none;
+  height: 100dvh;
+  scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Pages --- */
+
+.page {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 1.5rem 4rem;
+  overflow-y: auto;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  margin: auto 0;
+  padding: 5rem 0 2rem; /* top pad clears the fixed header */
+}

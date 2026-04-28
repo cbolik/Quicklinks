@@ -1,0 +1,104 @@
+/* --- Link wrapper --- */
+
+.link-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.link-content {
+  flex: 1;
+  display: block;
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  font-weight: 300;
+  line-height: 2.2;
+  color: #1DB954;
+  text-decoration: none;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease;
+}
+
+.link-content:hover,
+.link-content:focus-visible {
+  color: #1ed760;
+}
+
+.link-content:active {
+  color: rgba(29, 185, 84, 0.55);
+}
+
+/* --- Edit mode row controls --- */
+
+.drag-handle,
+.edit-link-btn,
+.delete-btn {
+  display: none;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+body.edit-mode .drag-handle,
+body.edit-mode .edit-link-btn,
+body.edit-mode .delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-handle {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 1.1rem;
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.edit-link-btn {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  transition: color 0.15s ease;
+}
+
+.edit-link-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.delete-btn {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.1rem;
+  transition: color 0.15s ease;
+}
+
+.delete-btn:hover {
+  color: #e74c3c;
+}
+
+/* In edit mode links are not tappable */
+body.edit-mode .link-content {
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Drag states */
+.link-wrapper.dragging {
+  opacity: 0.35;
+}
+
+.link-wrapper.drag-above {
+  border-top: 2px solid #1DB954;
+}
+
+.link-wrapper.drag-below {
+  border-bottom: 2px solid #1DB954;
+}
