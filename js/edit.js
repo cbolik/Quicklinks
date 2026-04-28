@@ -64,9 +64,18 @@ export const initMenu = (elements, { openDialog, onRender }) => {
 const openMenu = () => menuDropdown.classList.remove('hidden');
 const closeMenu = () => menuDropdown.classList.add('hidden');
 
-const exportLinks = () => {
-  const blob = new Blob([JSON.stringify(loadLinks(), null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+const exportLinks = async () => {
+  const json = JSON.stringify(loadLinks(), null, 2);
+  const file = new File([json], 'quicklinks-export.json', { type: 'application/json' });
+
+  // Use native share sheet on iOS (saves to Files/iCloud, AirDrop, etc.)
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: 'Quicklinks Export' }); } catch { /* dismissed */ }
+    return;
+  }
+
+  // Desktop fallback: trigger a file download
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   const a = Object.assign(document.createElement('a'), { href: url, download: 'quicklinks-export.json' });
   document.body.appendChild(a);
   a.click();

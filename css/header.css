@@ -31,23 +31,23 @@
 
 .menu-btn {
   position: absolute;
-  top: 0.65rem;
-  right: 0.75rem;
+  top: 0.55rem;
+  right: 0.65rem;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.6rem;
   line-height: 1;
   font-family: inherit;
   cursor: pointer;
   pointer-events: auto;
-  padding: 0.25rem 0.4rem;
+  padding: 0.25rem 0.5rem;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.15s ease;
 }
 
 .menu-btn:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 body.edit-mode .menu-btn {
