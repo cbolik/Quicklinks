@@ -46,6 +46,33 @@ body {
   padding-bottom: 0.5rem;
 }
 
+.edit-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: 0.25rem 0.5rem;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease;
+}
+
+.edit-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.edit-mode .edit-btn {
+  color: white;
+}
+
 /* --- Carousel layout --- */
 
 .carousel {
@@ -102,18 +129,18 @@ nav {
   max-width: 480px;
 }
 
-/* --- Link wrapper (for delete support) --- */
+/* --- Link wrapper --- */
 
 .link-wrapper {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .link-content {
+  flex: 1;
   display: block;
-  position: relative;
-  z-index: 1;
   font-size: clamp(1.5rem, 6vw, 1.9rem);
   font-weight: 300;
   line-height: 2.2;
@@ -122,7 +149,6 @@ nav {
   text-align: center;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.15s ease;
-  background-color: #0d0d0d;
 }
 
 .link-content:hover,
@@ -134,51 +160,78 @@ nav {
   color: rgba(29, 185, 84, 0.55);
 }
 
-/* --- Delete button --- */
+/* --- Edit mode row controls --- */
 
+.drag-handle,
+.edit-link-btn,
 .delete-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  background: #e74c3c;
-  color: white;
+  display: none;
+  flex-shrink: 0;
+  background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 400;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+body.edit-mode .drag-handle,
+body.edit-mode .edit-link-btn,
+body.edit-mode .delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Touch devices: red "Delete" behind swipe */
-@media (hover: none) {
-  .delete-btn {
-    width: 80px;
-    padding: 0 1rem;
-  }
+.drag-handle {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 1.1rem;
+  cursor: grab;
+  touch-action: none;
 }
 
-/* Desktop: small X on hover */
-@media (hover: hover) {
-  .delete-btn {
-    width: 2rem;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 1.1rem;
-    opacity: 0;
-    transition: opacity 0.15s ease, color 0.15s ease;
-    z-index: 2;
-  }
+.drag-handle:active {
+  cursor: grabbing;
+}
 
-  .link-wrapper:hover .delete-btn {
-    opacity: 1;
-  }
+.edit-link-btn {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  transition: color 0.15s ease;
+}
 
-  .delete-btn:hover {
-    color: #e74c3c;
-  }
+.edit-link-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.delete-btn {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.1rem;
+  transition: color 0.15s ease;
+}
+
+.delete-btn:hover {
+  color: #e74c3c;
+}
+
+/* In edit mode links are not tappable */
+body.edit-mode .link-content {
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Drag states */
+.link-wrapper.dragging {
+  opacity: 0.35;
+}
+
+.link-wrapper.drag-above {
+  border-top: 2px solid #1DB954;
+}
+
+.link-wrapper.drag-below {
+  border-bottom: 2px solid #1DB954;
 }
 
 /* --- Indicators --- */

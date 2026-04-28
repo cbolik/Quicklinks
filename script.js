@@ -38,22 +38,57 @@
     return hex;
   }
 
+  function updateLink(id, data) {
+    var links = loadLinks();
+    links = links.map(function (l) {
+      return l.id === id ? { id: l.id, category: data.category, name: data.name, url: data.url } : l;
+    });
+    saveLinks(links);
+  }
+
+  function reorderLinks(category, orderedIds) {
+    var links = loadLinks();
+    // Extract links for this category in the new order
+    var byId = {};
+    links.forEach(function (l) { byId[l.id] = l; });
+    var reordered = orderedIds.map(function (id) { return byId[id]; }).filter(Boolean);
+    // Rebuild full array: links from other categories in their original positions,
+    // with this category's links replaced by the reordered set
+    var result = [];
+    var categoryLinks = reordered.slice();
+    links.forEach(function (l) {
+      if (l.category === category) {
+        result.push(categoryLinks.shift());
+      } else {
+        result.push(l);
+      }
+    });
+    saveLinks(result);
+  }
+
   // --- DOM references ---
   var carousel = document.querySelector('.carousel');
   var arrowLeft = document.querySelector('.arrow-left');
   var arrowRight = document.querySelector('.arrow-right');
   var fab = document.querySelector('.fab');
   var dialogBackdrop = document.querySelector('.dialog-backdrop');
+  var dialogTitle = dialogBackdrop.querySelector('.dialog-title');
   var addForm = document.getElementById('add-link-form');
   var categoryInput = document.getElementById('link-category');
   var nameInput = document.getElementById('link-name');
   var urlInput = document.getElementById('link-url');
   var categoryList = document.getElementById('category-list');
   var cancelBtn = document.querySelector('.btn-cancel');
+  var submitBtn = addForm.querySelector('.btn-add');
   var indicators = document.querySelector('.indicators');
   var pageHeader = document.querySelector('.page-header');
   var pageHeaderLabel = pageHeader.querySelector('.label');
   var pageHeaderDots = pageHeader.querySelector('.page-header-dots');
+  var editBtn = pageHeader.querySelector('.edit-btn');
+
+  // Edit mode state
+  var editMode = false;
+  var editingLinkId = null;
 
   // Track handlers so we can remove them on re-render
   var currentScrollHandler = null;
@@ -99,23 +134,36 @@
       pageContent.className = 'page-content';
 
       var nav = document.createElement('nav');
+      nav.setAttribute('data-category', cat);
       grouped[cat].forEach(function (link) {
         var wrapper = document.createElement('div');
         wrapper.className = 'link-wrapper';
         wrapper.setAttribute('data-id', link.id);
 
-        var delBtn = document.createElement('button');
-        delBtn.className = 'delete-btn';
-        delBtn.setAttribute('aria-label', 'Delete ' + link.name);
-        delBtn.textContent = isTouch ? 'Delete' : '\u00d7';
+        var handle = document.createElement('button');
+        handle.className = 'drag-handle';
+        handle.setAttribute('aria-label', 'Drag to reorder');
+        handle.textContent = '\u2630';
 
         var a = document.createElement('a');
         a.href = link.url;
         a.textContent = link.name;
         a.className = 'link-content';
 
-        wrapper.appendChild(delBtn);
+        var editLinkBtn = document.createElement('button');
+        editLinkBtn.className = 'edit-link-btn';
+        editLinkBtn.setAttribute('aria-label', 'Edit ' + link.name);
+        editLinkBtn.textContent = '\u270e';
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.setAttribute('aria-label', 'Delete ' + link.name);
+        delBtn.textContent = '\u00d7';
+
+        wrapper.appendChild(handle);
         wrapper.appendChild(a);
+        wrapper.appendChild(editLinkBtn);
+        wrapper.appendChild(delBtn);
         nav.appendChild(wrapper);
       });
 
@@ -126,7 +174,11 @@
 
     applySpotifyRewriting();
     initCarousel(categories);
-    wireDeleteHandlers();
+    wireEditHandlers();
+    if (editMode) {
+      document.body.classList.add('edit-mode');
+      editBtn.textContent = 'Done';
+    }
   }
 
   function renderEmptyState() {
@@ -142,7 +194,7 @@
     var btn = document.createElement('button');
     btn.className = 'empty-add-btn';
     btn.textContent = '+ Add Link';
-    btn.addEventListener('click', openDialog);
+    btn.addEventListener('click', function () { openDialog(); });
     section.appendChild(btn);
 
     carousel.appendChild(section);
@@ -423,62 +475,53 @@
     carousel.addEventListener('touchend', currentTouchEndHandler, { passive: true });
   }
 
-  // --- Delete handling ---
-  function wireDeleteHandlers() {
+  // --- Edit mode toggle ---
+  function enterEditMode() {
+    editMode = true;
+    document.body.classList.add('edit-mode');
+    editBtn.textContent = 'Done';
+  }
+
+  function exitEditMode() {
+    editMode = false;
+    document.body.classList.remove('edit-mode');
+    editBtn.textContent = 'Edit';
+  }
+
+  editBtn.addEventListener('click', function () {
+    if (editMode) exitEditMode(); else enterEditMode();
+  });
+
+  // --- Edit handlers (delete, edit, drag-to-reorder) ---
+  function wireEditHandlers() {
     var wrappers = document.querySelectorAll('.link-wrapper');
 
     wrappers.forEach(function (wrapper) {
-      var delBtn = wrapper.querySelector('.delete-btn');
-      var linkContent = wrapper.querySelector('.link-content');
       var id = wrapper.getAttribute('data-id');
+      var delBtn = wrapper.querySelector('.delete-btn');
+      var editLinkBtn = wrapper.querySelector('.edit-link-btn');
+      var handle = wrapper.querySelector('.drag-handle');
 
       delBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         deleteLink(id);
       });
 
-      if (isTouch) {
-        var startX = 0;
-        var currentX = 0;
-        var swiping = false;
+      editLinkBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openDialog(id);
+      });
 
-        linkContent.addEventListener('touchstart', function (e) {
-          startX = e.touches[0].clientX;
-          currentX = startX;
-          swiping = true;
-          linkContent.style.transition = 'none';
+      // Drag handle: touch + mouse
+      handle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        startDrag(wrapper, e.clientY);
+      });
 
-          // Close any other open swipes
-          document.querySelectorAll('.link-content.swiped').forEach(function (el) {
-            if (el !== linkContent) {
-              el.classList.remove('swiped');
-              el.style.transform = '';
-              el.style.transition = '';
-            }
-          });
-        }, { passive: true });
-
-        linkContent.addEventListener('touchmove', function (e) {
-          if (!swiping) return;
-          currentX = e.touches[0].clientX;
-          var dx = currentX - startX;
-          if (dx > 0) dx = 0;
-          linkContent.style.transform = 'translateX(' + dx + 'px)';
-        }, { passive: true });
-
-        linkContent.addEventListener('touchend', function () {
-          swiping = false;
-          var dx = currentX - startX;
-          linkContent.style.transition = 'transform 0.2s ease';
-          if (dx < -80) {
-            linkContent.classList.add('swiped');
-            linkContent.style.transform = 'translateX(-80px)';
-          } else {
-            linkContent.classList.remove('swiped');
-            linkContent.style.transform = '';
-          }
-        });
-      }
+      handle.addEventListener('touchstart', function (e) {
+        e.stopPropagation(); // don't trigger carousel swipe
+        startDrag(wrapper, e.touches[0].clientY);
+      }, { passive: true });
     });
   }
 
@@ -489,8 +532,93 @@
     render();
   }
 
+  // --- Drag-to-reorder ---
+  function startDrag(wrapper, startY) {
+    var nav = wrapper.closest('nav');
+    if (!nav) return;
+    var category = nav.getAttribute('data-category');
+    var currentY = startY;
+    var over = null;
+
+    wrapper.classList.add('dragging');
+
+    function getSiblings() {
+      return Array.prototype.slice.call(nav.querySelectorAll('.link-wrapper:not(.dragging)'));
+    }
+
+    function clearDropIndicators() {
+      getSiblings().forEach(function (s) {
+        s.classList.remove('drag-above', 'drag-below');
+      });
+    }
+
+    function findDropTarget(y) {
+      var siblings = getSiblings();
+      for (var i = 0; i < siblings.length; i++) {
+        var rect = siblings[i].getBoundingClientRect();
+        var mid = rect.top + rect.height / 2;
+        if (y < mid) {
+          return { sibling: siblings[i], position: 'above' };
+        }
+      }
+      // Below all siblings
+      if (siblings.length > 0) {
+        return { sibling: siblings[siblings.length - 1], position: 'below' };
+      }
+      return null;
+    }
+
+    function onMove(y) {
+      currentY = y;
+      clearDropIndicators();
+      var target = findDropTarget(y);
+      if (target) {
+        over = target;
+        target.sibling.classList.add(target.position === 'above' ? 'drag-above' : 'drag-below');
+      } else {
+        over = null;
+      }
+    }
+
+    function onEnd() {
+      document.removeEventListener('mousemove', mouseMove);
+      document.removeEventListener('mouseup', mouseUp);
+      document.removeEventListener('touchmove', touchMove);
+      document.removeEventListener('touchend', touchEnd);
+
+      wrapper.classList.remove('dragging');
+      clearDropIndicators();
+
+      // Commit DOM reorder
+      if (over) {
+        if (over.position === 'above') {
+          nav.insertBefore(wrapper, over.sibling);
+        } else {
+          var next = over.sibling.nextSibling;
+          nav.insertBefore(wrapper, next);
+        }
+      }
+
+      // Persist new order
+      var newIds = Array.prototype.slice.call(nav.querySelectorAll('.link-wrapper')).map(function (w) {
+        return w.getAttribute('data-id');
+      });
+      reorderLinks(category, newIds);
+    }
+
+    function mouseMove(e) { onMove(e.clientY); }
+    function mouseUp() { onEnd(); }
+    function touchMove(e) { onMove(e.touches[0].clientY); }
+    function touchEnd() { onEnd(); }
+
+    document.addEventListener('mousemove', mouseMove);
+    document.addEventListener('mouseup', mouseUp);
+    document.addEventListener('touchmove', touchMove, { passive: true });
+    document.addEventListener('touchend', touchEnd, { passive: true });
+  }
+
   // --- Dialog handling ---
-  function openDialog() {
+  function openDialog(linkId) {
     var links = loadLinks();
     var cats = [];
     links.forEach(function (l) {
@@ -503,18 +631,37 @@
       categoryList.appendChild(option);
     });
 
-    categoryInput.value = '';
-    nameInput.value = '';
-    urlInput.value = '';
+    if (linkId) {
+      editingLinkId = linkId;
+      var link = links.filter(function (l) { return l.id === linkId; })[0];
+      if (link) {
+        categoryInput.value = link.category;
+        nameInput.value = link.name;
+        urlInput.value = link.url;
+      }
+      dialogTitle.textContent = 'Edit Link';
+      submitBtn.textContent = 'Save';
+    } else {
+      editingLinkId = null;
+      categoryInput.value = '';
+      nameInput.value = '';
+      urlInput.value = '';
+      dialogTitle.textContent = 'Add Link';
+      submitBtn.textContent = 'Add Link';
+    }
+
     dialogBackdrop.classList.remove('hidden');
-    categoryInput.focus();
+    nameInput.focus();
   }
 
   function closeDialog() {
     dialogBackdrop.classList.add('hidden');
+    editingLinkId = null;
+    dialogTitle.textContent = 'Add Link';
+    submitBtn.textContent = 'Add Link';
   }
 
-  fab.addEventListener('click', openDialog);
+  fab.addEventListener('click', function () { openDialog(); });
   cancelBtn.addEventListener('click', closeDialog);
 
   dialogBackdrop.addEventListener('click', function (e) {
@@ -529,28 +676,34 @@
 
     if (!category || !name || !url) return;
 
-    var links = loadLinks();
-    links.push({
-      id: generateId(),
-      category: category,
-      name: name,
-      url: url
-    });
-    saveLinks(links);
-    closeDialog();
-    render();
+    if (editingLinkId) {
+      updateLink(editingLinkId, { category: category, name: name, url: url });
+      closeDialog();
+      render();
+    } else {
+      var links = loadLinks();
+      links.push({
+        id: generateId(),
+        category: category,
+        name: name,
+        url: url
+      });
+      saveLinks(links);
+      closeDialog();
+      render();
 
-    // Navigate to the page containing the new link
-    var allLinks = loadLinks();
-    var cats = [];
-    allLinks.forEach(function (l) {
-      if (cats.indexOf(l.category) === -1) cats.push(l.category);
-    });
-    var pageIndex = cats.indexOf(category);
-    if (pageIndex >= 0) {
-      setTimeout(function () {
-        carousel.scrollTo({ left: pageIndex * carousel.offsetWidth, behavior: 'smooth' });
-      }, 100);
+      // Navigate to the page containing the new link
+      var allLinks = loadLinks();
+      var cats = [];
+      allLinks.forEach(function (l) {
+        if (cats.indexOf(l.category) === -1) cats.push(l.category);
+      });
+      var pageIndex = cats.indexOf(category);
+      if (pageIndex >= 0) {
+        setTimeout(function () {
+          carousel.scrollTo({ left: pageIndex * carousel.offsetWidth, behavior: 'smooth' });
+        }, 100);
+      }
     }
   });
 
