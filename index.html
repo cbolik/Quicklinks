@@ -14,8 +14,15 @@
   <div class="page-header hidden">
     <p class="label"></p>
     <div class="page-header-dots"></div>
-    <button class="edit-btn" aria-label="Edit links">Edit</button>
+    <button class="menu-btn" aria-label="More options">&#8942;</button>
+    <div class="menu-dropdown hidden">
+      <button class="menu-item" data-action="edit">Edit</button>
+      <button class="menu-item" data-action="export">Export</button>
+      <button class="menu-item" data-action="import">Import</button>
+    </div>
   </div>
+
+  <input type="file" id="import-file" accept=".json" class="hidden" />
 
   <main class="carousel"></main>
 

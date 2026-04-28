@@ -84,7 +84,9 @@
   var pageHeader = document.querySelector('.page-header');
   var pageHeaderLabel = pageHeader.querySelector('.label');
   var pageHeaderDots = pageHeader.querySelector('.page-header-dots');
-  var editBtn = pageHeader.querySelector('.edit-btn');
+  var menuBtn = pageHeader.querySelector('.menu-btn');
+  var menuDropdown = pageHeader.querySelector('.menu-dropdown');
+  var importFileInput = document.getElementById('import-file');
 
   // Edit mode state
   var editMode = false;
@@ -177,7 +179,7 @@
     wireEditHandlers();
     if (editMode) {
       document.body.classList.add('edit-mode');
-      editBtn.textContent = 'Done';
+      menuBtn.textContent = 'Done';
     }
   }
 
@@ -479,18 +481,104 @@
   function enterEditMode() {
     editMode = true;
     document.body.classList.add('edit-mode');
-    editBtn.textContent = 'Done';
+    menuBtn.textContent = 'Done';
   }
 
   function exitEditMode() {
     editMode = false;
     document.body.classList.remove('edit-mode');
-    editBtn.textContent = 'Edit';
+    menuBtn.textContent = '⋮';
   }
 
-  editBtn.addEventListener('click', function () {
-    if (editMode) exitEditMode(); else enterEditMode();
+  // --- Menu ---
+  function openMenu() {
+    menuDropdown.classList.remove('hidden');
+  }
+
+  function closeMenu() {
+    menuDropdown.classList.add('hidden');
+  }
+
+  menuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (editMode) {
+      exitEditMode();
+    } else {
+      menuDropdown.classList.contains('hidden') ? openMenu() : closeMenu();
+    }
   });
+
+  document.addEventListener('click', function () {
+    closeMenu();
+  });
+
+  menuDropdown.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+
+  document.querySelectorAll('.menu-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+      var action = item.getAttribute('data-action');
+      closeMenu();
+      if (action === 'edit') {
+        enterEditMode();
+      } else if (action === 'export') {
+        exportLinks();
+      } else if (action === 'import') {
+        importFileInput.click();
+      }
+    });
+  });
+
+  // --- Export ---
+  function exportLinks() {
+    var links = loadLinks();
+    var blob = new Blob([JSON.stringify(links, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'quicklinks-export.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // --- Import ---
+  importFileInput.addEventListener('change', function () {
+    var file = importFileInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        var imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error('Invalid format');
+        mergeLinks(imported);
+      } catch (err) {
+        alert('Could not read file — make sure it\'s a valid Quicklinks export.');
+      }
+      importFileInput.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  function mergeLinks(imported) {
+    var existing = loadLinks();
+    var existingIds = {};
+    existing.forEach(function (l) { existingIds[l.id] = true; });
+    var added = 0;
+    imported.forEach(function (l) {
+      if (l.id && l.category && l.name && l.url && !existingIds[l.id]) {
+        existing.push(l);
+        added++;
+      }
+    });
+    saveLinks(existing);
+    render();
+    if (added === 0) {
+      alert('No new links found — everything was already here.');
+    }
+  }
 
   // --- Edit handlers (delete, edit, drag-to-reorder) ---
   function wireEditHandlers() {
