@@ -201,3 +201,21 @@
   background: #1DB954;
   color: white;
 }
+
+.empty-import-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.6rem 1.4rem;
+  font-family: inherit;
+  margin-top: 0.75rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.empty-import-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+}

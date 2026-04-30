@@ -162,12 +162,17 @@ const renderEmptyState = () => {
     className: 'empty-message', textContent: 'Your links will appear here',
   });
 
-  const btn = Object.assign(document.createElement('button'), {
-    className: 'empty-add-btn', textContent: '+ Add Link',
+  const addBtn = Object.assign(document.createElement('button'), {
+    className: 'empty-add-btn', textContent: 'Add Link',
   });
-  btn.addEventListener('click', () => openDialog());
+  addBtn.addEventListener('click', () => openDialog());
 
-  section.append(p, btn);
+  const importBtn = Object.assign(document.createElement('button'), {
+    className: 'empty-import-btn', textContent: 'Import',
+  });
+  importBtn.addEventListener('click', () => importFileInput.click());
+
+  section.append(p, addBtn, importBtn);
   carousel.appendChild(section);
 };
 
