@@ -108,6 +108,22 @@
   min-width: 0;
 }
 
+.page-edit-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.page-edit-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .page-delete-btn {
   background: none;
   border: none;

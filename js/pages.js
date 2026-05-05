@@ -54,13 +54,19 @@ const createPageRow = (category) => {
   });
   nameSpan.addEventListener('click', () => startRename(row));
 
+  const editBtn = Object.assign(document.createElement('button'), {
+    className: 'page-edit-btn', textContent: '✎',
+  });
+  editBtn.setAttribute('aria-label', `Rename ${category}`);
+  editBtn.addEventListener('click', () => startRename(row));
+
   const delBtn = Object.assign(document.createElement('button'), {
     className: 'page-delete-btn', textContent: '×',
   });
   delBtn.setAttribute('aria-label', `Delete ${category}`);
   delBtn.addEventListener('click', () => handleDelete(row.dataset.category));
 
-  row.append(handle, nameSpan, delBtn);
+  row.append(handle, nameSpan, editBtn, delBtn);
   return row;
 };
 
