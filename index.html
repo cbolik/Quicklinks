@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/header.css" />
   <link rel="stylesheet" href="css/links.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
 </head>
 <body>
   <div class="page-header hidden">
@@ -20,6 +21,7 @@
     <div class="page-header-dots"></div>
     <button class="menu-btn" aria-label="More options">&#8942;</button>
     <div class="menu-dropdown hidden">
+      <button class="menu-item" data-action="pages">Pages</button>
       <button class="menu-item" data-action="edit">Edit</button>
       <button class="menu-item" data-action="export">Export</button>
       <button class="menu-item" data-action="import">Import</button>
@@ -56,6 +58,16 @@
           <button type="submit" class="btn-add">Add Link</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="pages-backdrop hidden">
+    <div class="pages-editor">
+      <div class="pages-header">
+        <h2 class="pages-title">Pages</h2>
+        <button class="pages-done-btn">Done</button>
+      </div>
+      <div class="pages-list"></div>
     </div>
   </div>
 

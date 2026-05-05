@@ -29,3 +29,39 @@ export const reorderLinks = (category, orderedIds) => {
   const pool = [...reordered];
   saveLinks(links.map(l => l.category === category ? pool.shift() : l));
 };
+
+export const getCategories = () => {
+  const seen = new Set();
+  const categories = [];
+  for (const link of loadLinks()) {
+    if (!seen.has(link.category)) {
+      seen.add(link.category);
+      categories.push(link.category);
+    }
+  }
+  return categories;
+};
+
+export const reorderPages = (orderedCategories) => {
+  const links = loadLinks();
+  const byCategory = {};
+  for (const link of links) {
+    (byCategory[link.category] ??= []).push(link);
+  }
+  const handled = new Set(orderedCategories);
+  const reordered = [
+    ...orderedCategories.flatMap(cat => byCategory[cat] ?? []),
+    ...links.filter(l => !handled.has(l.category)),
+  ];
+  saveLinks(reordered);
+};
+
+export const renamePage = (oldName, newName) => {
+  saveLinks(loadLinks().map(l =>
+    l.category === oldName ? { ...l, category: newName } : l
+  ));
+};
+
+export const deletePageLinks = (category) => {
+  saveLinks(loadLinks().filter(l => l.category !== category));
+};

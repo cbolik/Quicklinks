@@ -1,0 +1,141 @@
+/* --- Pages editor --- */
+
+.pages-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 1rem;
+}
+
+.pages-backdrop.hidden {
+  display: none;
+}
+
+.pages-editor {
+  background: #1a1a1a;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 360px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+
+.pages-title {
+  color: white;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.pages-done-btn {
+  background: none;
+  border: none;
+  color: #1DB954;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.15s ease;
+}
+
+.pages-done-btn:hover {
+  color: #1ed760;
+}
+
+.pages-list {
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.page-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  gap: 0.75rem;
+}
+
+.page-row + .page-row {
+  border-top: 1px solid #2a2a2a;
+}
+
+.page-drag-handle {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: grab;
+  padding: 0.25rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.page-name {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.page-name:hover {
+  color: white;
+}
+
+.page-name-input {
+  flex: 1;
+  background: #2a2a2a;
+  border: 1px solid #1DB954;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-family: inherit;
+  padding: 0.25rem 0.5rem;
+  outline: none;
+  min-width: 0;
+}
+
+.page-delete-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.page-delete-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.page-row.dragging {
+  opacity: 0.4;
+}
+
+.page-row.drag-above {
+  box-shadow: 0 -2px 0 #1DB954;
+}
+
+.page-row.drag-below {
+  box-shadow: 0 2px 0 #1DB954;
+}
+
+body.pages-open .fab {
+  display: none;
+}

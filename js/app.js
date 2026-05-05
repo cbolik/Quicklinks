@@ -2,6 +2,7 @@ import { loadLinks, saveLinks } from './storage.js';
 import { initCarousel } from './carousel.js';
 import { initDialog, openDialog } from './dialog.js';
 import { isEditMode, enterEditMode, initMenu, wireEditHandlers } from './edit.js';
+import { initPagesEditor } from './pages.js';
 
 // --- Platform detection ---
 const ua = navigator.userAgent;
@@ -72,6 +73,7 @@ const menuBtn        = pageHeader.querySelector('.menu-btn');
 const menuDropdown   = pageHeader.querySelector('.menu-dropdown');
 const importFileInput = document.getElementById('import-file');
 const dialogBackdrop = document.querySelector('.dialog-backdrop');
+const pagesBackdrop  = document.querySelector('.pages-backdrop');
 
 // --- Render pipeline ---
 const render = () => {
@@ -193,6 +195,7 @@ initDialog(
   render
 );
 
+initPagesEditor({ pagesBackdrop }, render);
 initMenu({ menuBtn, menuDropdown, importFileInput }, { openDialog, onRender: render });
 
 // --- Boot ---

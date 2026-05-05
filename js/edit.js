@@ -1,4 +1,5 @@
 import { loadLinks, saveLinks, reorderLinks } from './storage.js';
+import { openPagesEditor } from './pages.js';
 
 // Edit mode state
 let editMode = false;
@@ -37,7 +38,8 @@ export const initMenu = (elements, { openDialog, onRender }) => {
     item.addEventListener('click', () => {
       closeMenu();
       const action = item.getAttribute('data-action');
-      if (action === 'edit') enterEditMode();
+      if (action === 'pages') openPagesEditor();
+      else if (action === 'edit') enterEditMode();
       else if (action === 'export') exportLinks();
       else if (action === 'import') importFileInput.click();
     });
