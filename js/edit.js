@@ -42,6 +42,7 @@ export const initMenu = (elements, { openDialog, onRender }) => {
       else if (action === 'edit') enterEditMode();
       else if (action === 'export') exportLinks();
       else if (action === 'import') importFileInput.click();
+      else if (action === 'about') window.location.href = 'https://github.com/cbolik/Quicklinks/blob/main/README.md';
     });
   });
 

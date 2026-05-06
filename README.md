@@ -34,6 +34,12 @@ Tap **⋮ → Edit** to enter edit mode. Each link row gains a drag handle (☰)
 
 Tap **⋮ → Pages** to open the page editor. Drag handles (☰) to reorder, tap the name or the ✎ to rename, × to delete a page and all its links.
 
+### Backing up and syncing
+
+Tap **⋮ → Export** to save your links as a `quicklinks-export.json` file. On iOS/iPadOS this opens the native Share Sheet (save to Files, send via AirDrop, etc.); on macOS it downloads the file directly.
+
+Tap **⋮ → Import** (or the **Import** button on the empty-state screen) to load a previously exported file. Importing merges with existing links — duplicates are skipped, nothing is overwritten.
+
 ### Navigating pages
 
 - **Mobile:** swipe left/right — wraps around continuously
@@ -42,9 +48,11 @@ Tap **⋮ → Pages** to open the page editor. Drag handles (☰) to reorder, ta
 
 ---
 
-## Sharing links from other apps (iOS / iPadOS)
+## Sharing links from other apps (iOS, iPadOS, macOS)
 
-You can share any URL directly into Quicklinks from the iOS Share Sheet using a Shortcuts automation. When triggered, Quicklinks opens with the Add Link dialog pre-populated — just pick a page and save.
+You can share any URL directly into Quicklinks from the Share Sheet using a Shortcuts automation. When triggered, Quicklinks opens with the Add Link dialog pre-populated — just pick a page and save.
+
+> **Requirements:** iOS / iPadOS 16+ or macOS Monterey (12)+ for the Shortcuts app.
 
 ### How it works
 
@@ -52,9 +60,11 @@ Quicklinks reads `?add=<url>&title=<name>` query parameters on load, opens the d
 
 ### Setting up the Shortcut (one-time)
 
-1. Open the **Shortcuts** app → tap **+** to create a new shortcut
+The steps are the same on iOS, iPadOS, and macOS — the Shortcuts app UI is nearly identical across all three.
+
+1. Open the **Shortcuts** app → tap/click **+** to create a new shortcut
 2. Tap the title at the top and rename it **"Add to Quicklinks"**
-3. Tap the **ⓘ** icon (bottom of screen) → enable **Share Sheet** → set input type to **URLs** → tap Done
+3. Tap the **ⓘ** icon (bottom of screen, or the toolbar on Mac) → enable **Share Sheet** → set input type to **URLs** → tap Done
 4. Add the following three actions:
 
    **Action 1 — Text**
@@ -76,7 +86,7 @@ Quicklinks reads `?add=<url>&title=<name>` query parameters on load, opens the d
 
 ### Using it
 
-In any app — Safari, YouTube, Chrome, Podcasts, etc. — tap the **Share** button then **Add to Quicklinks**. Quicklinks opens in Safari with the URL already filled in. When sharing from Safari the page title is pre-filled too; for other apps you type the name yourself. Choose a page, tap **Add Link**, done.
+In any app — Safari, YouTube, Chrome, Podcasts, etc. — tap the **Share** button then **Add to Quicklinks**. Quicklinks opens in your browser with the URL already filled in. When sharing from Safari the page title is pre-filled too; for other apps you type the name yourself. Choose a page, tap **Add Link**, done.
 
 ---
 
@@ -108,7 +118,7 @@ No build step required. It's three files.
 1. **Fork or clone this repo**
 2. **Enable GitHub Pages** (Settings → Pages → Deploy from branch `main`)
 3. **Add to your iPhone home screen** (Share → Add to Home Screen) for a full-screen launcher experience
-4. Your links are stored in `localStorage` on each device — re-add them after setting up on a new device
+4. **Moving to a new device:** use **⋮ → Export** on your old device to save a backup, then **⋮ → Import** (or the Import button on the empty-state screen) on the new one. Links are stored in `localStorage` and don't sync automatically.
 
 That's it. Your links never appear in the repo.
 
