@@ -26,16 +26,57 @@ Tap the **+** button (bottom right) and fill in:
 - **Name** — the display label for the link (e.g. "Current Tracks")
 - **Link** — the URL or deep link URI (see examples below)
 
-### Deleting links
+### Editing and deleting links
 
-- **Mobile:** swipe a link left to reveal a red Delete button
-- **Desktop:** hover over a link and click the × that appears
+Tap **⋮ → Edit** to enter edit mode. Each link row gains a drag handle (☰) for reordering, a pencil button (✎) to edit, and a × to delete.
+
+### Managing pages
+
+Tap **⋮ → Pages** to open the page editor. Drag handles (☰) to reorder, tap the name or the ✎ to rename, × to delete a page and all its links.
 
 ### Navigating pages
 
 - **Mobile:** swipe left/right — wraps around continuously
 - **Desktop:** click the `‹` `›` arrows, or use the left/right keyboard arrow keys
 - **Dots** at the top show which page you're on and can be tapped directly
+
+---
+
+## Sharing links from other apps (iOS / iPadOS)
+
+You can share any URL directly into Quicklinks from the iOS Share Sheet using a Shortcuts automation. When triggered, Quicklinks opens with the Add Link dialog pre-populated — just pick a page and save.
+
+### How it works
+
+Quicklinks reads `?add=<url>&title=<name>` query parameters on load, opens the dialog with those fields pre-filled, then immediately strips the parameters from the address bar so a reload doesn't re-trigger it.
+
+### Setting up the Shortcut (one-time)
+
+1. Open the **Shortcuts** app → tap **+** to create a new shortcut
+2. Tap the title at the top and rename it **"Add to Quicklinks"**
+3. Tap the **ⓘ** icon (bottom of screen) → enable **Share Sheet** → set input type to **URLs** → tap Done
+4. Add the following three actions:
+
+   **Action 1 — Text**
+   Paste exactly:
+   ```
+   https://cbolik.github.io/Quicklinks/?add=
+   ```
+   Then tap the variable token menu and insert **Shortcut Input**, tap the inserted token and choose **URL** → enable **URL Encode**. Append `&title=`, insert **Shortcut Input** again, tap the token and choose **Name** → enable **URL Encode**.
+
+   The full text should read (tokens shown in brackets):
+   ```
+   https://cbolik.github.io/Quicklinks/?add=[Shortcut Input (URL Encoded)]&title=[Shortcut Input - Name (URL Encoded)]
+   ```
+
+   **Action 2 — Open URLs**
+   Set the URL to **[Text from Action 1]**
+
+5. Tap **Done** to save
+
+### Using it
+
+In any app — Safari, YouTube, Chrome, Podcasts, etc. — tap the **Share** button then **Add to Quicklinks**. Quicklinks opens in Safari with the URL already filled in. When sharing from Safari the page title is pre-filled too; for other apps you type the name yourself. Choose a page, tap **Add Link**, done.
 
 ---
 

@@ -52,7 +52,7 @@ export const initDialog = (elements, renderCallback) => {
   });
 };
 
-export const openDialog = (linkId) => {
+export const openDialog = (linkId, prefill = {}) => {
   const links = loadLinks();
   const cats = [...new Set(links.map(l => l.category))];
 
@@ -75,15 +75,20 @@ export const openDialog = (linkId) => {
     submitBtn.textContent = 'Save';
   } else {
     editingLinkId = null;
-    categoryInput.value = '';
-    nameInput.value = '';
-    urlInput.value = '';
+    categoryInput.value = prefill.category ?? '';
+    nameInput.value = prefill.name ?? '';
+    urlInput.value = prefill.url ?? '';
     dialogTitle.textContent = 'Add Link';
     submitBtn.textContent = 'Add Link';
   }
 
   dialogBackdrop.classList.remove('hidden');
-  nameInput.focus();
+  // Focus the first empty field so the user lands on what still needs filling in
+  if (prefill.name) {
+    categoryInput.focus();
+  } else {
+    nameInput.focus();
+  }
 };
 
 export const closeDialog = () => {

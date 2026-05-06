@@ -198,5 +198,17 @@ initDialog(
 initPagesEditor({ pagesBackdrop }, render);
 initMenu({ menuBtn, menuDropdown, importFileInput }, { openDialog, onRender: render });
 
+// --- Share-target: ?add=<url>&title=<name> ---
+const applyShareParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get('add');
+  if (!url) return;
+  const name = params.get('title') ?? '';
+  // Strip params immediately so a page reload doesn't re-open the dialog
+  history.replaceState(null, '', window.location.pathname);
+  openDialog(null, { url, name });
+};
+
 // --- Boot ---
 render();
+applyShareParams();
