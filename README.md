@@ -63,26 +63,25 @@ Quicklinks reads `?add=<url>&title=<name>` query parameters on load, opens the d
 The steps are the same on iOS, iPadOS, and macOS — the Shortcuts app UI is nearly identical across all three.
 
 1. Open the **Shortcuts** app → tap/click **+** to create a new shortcut
-2. Tap the title at the top and rename it **"Add to Quicklinks"**
-3. Tap the **ⓘ** icon (bottom of screen, or the toolbar on Mac) → enable **Share Sheet** → set input type to **URLs** → tap Done
-4. Add the following three actions:
+2. Tap the **dropdown arrow** next to the title → **Rename** → type **"Add to Quicklinks"**
+3. Add at least one action (if the ⓘ button is greyed out, add a placeholder action first — this appears to be required in iOS/iPadOS/macOS 26 before Share Sheet can be configured; we'll document the exact action once confirmed)
+4. Tap the **ⓘ** icon (bottom of screen, or the toolbar on Mac) → enable **Show in Share Sheet** → set input type to **URLs** → tap Done.
+   A **"Receive [URLs] from Share Sheet Input"** action is added automatically at the top of the shortcut.
+5. Add the following actions after it:
 
-   **Action 1 — Text**
-   Paste exactly:
-   ```
-   https://cbolik.github.io/Quicklinks/?add=
-   ```
-   Then tap the variable token menu and insert **Shortcut Input**, tap the inserted token and choose **URL** → enable **URL Encode**. Append `&title=`, insert **Shortcut Input** again, tap the token and choose **Name** → enable **URL Encode**.
+   **Action 1 — URL Encode**
+   Set input to **Shortcut Input**. This percent-encodes the shared URL so it's safe to use as a query parameter.
 
-   The full text should read (tokens shown in brackets):
+   **Action 2 — Text**
    ```
-   https://cbolik.github.io/Quicklinks/?add=[Shortcut Input (URL Encoded)]&title=[Shortcut Input - Name (URL Encoded)]
+   https://cbolik.github.io/Quicklinks/?add=[URL Encode]&title=[Shortcut Input → Name]
    ```
+   Insert the **URL Encode** output as the `add=` value. For the `title=` value, insert **Shortcut Input**, tap the token, and choose **Name** (the page title — available when sharing from Safari; empty for other apps).
 
-   **Action 2 — Open URLs**
-   Set the URL to **[Text from Action 1]**
+   **Action 3 — Open URL**
+   Set the URL to **[Text from Action 2]**
 
-5. Tap **Done** to save
+6. Tap **Done** to save
 
 ### Using it
 
