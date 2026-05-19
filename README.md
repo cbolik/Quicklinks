@@ -56,36 +56,39 @@ You can share any URL directly into Quicklinks from the Share Sheet using a Shor
 
 ### How it works
 
-Quicklinks reads `?add=<url>&title=<name>` query parameters on load, opens the dialog with those fields pre-filled, then immediately strips the parameters from the address bar so a reload doesn't re-trigger it.
+Quicklinks reads the `?add=<url>` query parameter on load, opens the Add Link dialog with the URL pre-filled, then immediately strips the parameter from the address bar so a reload doesn't re-trigger it. If the shared content is plain text containing a URL (e.g. from Calm), Quicklinks extracts the URL automatically.
 
 ### Setting up the Shortcut (one-time)
 
-The steps are the same on iOS, iPadOS, and macOS — the Shortcuts app UI is nearly identical across all three.
+The steps below are verified on iOS/iPadOS/macOS 26.
 
-1. Open the **Shortcuts** app → tap/click **+** to create a new shortcut
-2. Tap the **dropdown arrow** next to the title → **Rename** → type **"Add to Quicklinks"**
-3. Add at least one action (if the ⓘ button is greyed out, add a placeholder action first — this appears to be required in iOS/iPadOS/macOS 26 before Share Sheet can be configured; we'll document the exact action once confirmed)
-4. Tap the **ⓘ** icon (bottom of screen, or the toolbar on Mac) → enable **Show in Share Sheet** → set input type to **URLs** → tap Done.
-   A **"Receive [URLs] from Share Sheet Input"** action is added automatically at the top of the shortcut.
-5. Add the following actions after it:
+1. Open the **Shortcuts** app → tap **+** to create a new shortcut
+2. Tap the **dropdown arrow** next to the title → **Rename** → type **"Add To Quicklinks"**
+3. Add a temporary placeholder action (e.g. search for **"Open App"** and add it) — this is required to enable the **ⓘ** button in the bottom toolbar
+4. Tap **ⓘ** → enable **Show in Share Sheet** → tap **Done**.
+   A **"Receive from Share Sheet"** action is added automatically at the top.
+5. Delete the placeholder action from step 3
+6. Tap the **Receive** action and set the accepted input types to:
+   **Text**, **Rich Text**, **Safari Web Pages**, **URLs**, **Articles**
+7. Add the following three actions:
 
    **Action 1 — URL Encode**
-   Set input to **Shortcut Input**. This percent-encodes the shared URL so it's safe to use as a query parameter.
+   Set input to **Shortcut Input**
 
    **Action 2 — Text**
    ```
-   https://cbolik.github.io/Quicklinks/?add=[URL Encode]&title=[Shortcut Input → Name]
+   https://cbolik.github.io/Quicklinks/?add=
    ```
-   Insert the **URL Encode** output as the `add=` value. For the `title=` value, insert **Shortcut Input**, tap the token, and choose **Name** (the page title — available when sharing from Safari; empty for other apps).
+   After the `=`, insert the **URL Encoded Text** output from Action 1
 
-   **Action 3 — Open URL**
-   Set the URL to **[Text from Action 2]**
+   **Action 3 — Open**
+   Set to the **Text** output from Action 2
 
-6. Tap **Done** to save
+8. Tap **Done** to save
 
 ### Using it
 
-In any app — Safari, YouTube, Chrome, Podcasts, etc. — tap the **Share** button then **Add to Quicklinks**. Quicklinks opens in your browser with the URL already filled in. When sharing from Safari the page title is pre-filled too; for other apps you type the name yourself. Choose a page, tap **Add Link**, done.
+In any app — Safari, YouTube, Spotify, Chrome, Podcasts, Calm, etc. — tap the **Share** button then **Add To Quicklinks**. Quicklinks opens in your browser with the URL pre-filled. Type a name, choose a page, tap **Add Link**, done.
 
 ---
 
