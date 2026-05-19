@@ -16,7 +16,7 @@ export const enterEditMode = () => {
 export const exitEditMode = () => {
   editMode = false;
   document.body.classList.remove('edit-mode');
-  menuBtn.textContent = '⋮';
+  menuBtn.textContent = '☰';
 };
 
 // --- Menu + Export/Import ---
