@@ -5,13 +5,15 @@ let onRender = null;
 
 // DOM refs — set once by initDialog
 let dialogBackdrop, dialogTitle, addForm, categoryInput, nameInput, urlInput,
-    categoryList, submitBtn, cancelBtn, carousel;
+    categoryList, submitBtn, cancelBtn, carousel, urlHint;
 
 export const initDialog = (elements, renderCallback) => {
   ({ dialogBackdrop, dialogTitle, addForm, categoryInput, nameInput, urlInput,
      categoryList, submitBtn, cancelBtn, carousel } = elements);
+  urlHint = document.getElementById('url-hint');
   onRender = renderCallback;
 
+  urlInput.addEventListener('input', checkDuplicate);
   cancelBtn.addEventListener('click', closeDialog);
 
   dialogBackdrop.addEventListener('click', (e) => {
@@ -83,6 +85,7 @@ export const openDialog = (linkId, prefill = {}) => {
   }
 
   dialogBackdrop.classList.remove('hidden');
+  checkDuplicate();
   // Focus the first empty field so the user lands on what still needs filling in
   if (prefill.name) {
     categoryInput.focus();
@@ -96,4 +99,26 @@ export const closeDialog = () => {
   editingLinkId = null;
   dialogTitle.textContent = 'Add Link';
   submitBtn.textContent = 'Add Link';
+  clearDuplicateHint();
+};
+
+// --- Duplicate URL detection ---
+
+const checkDuplicate = () => {
+  const url = urlInput.value.trim();
+  if (!url) { clearDuplicateHint(); return; }
+  const match = loadLinks().find(l => l.url === url && l.id !== editingLinkId);
+  if (match) {
+    urlInput.classList.add('duplicate');
+    urlHint.textContent = `Already saved as "${match.name}" on ${match.category}`;
+    urlHint.classList.remove('hidden');
+  } else {
+    clearDuplicateHint();
+  }
+};
+
+const clearDuplicateHint = () => {
+  urlInput.classList.remove('duplicate');
+  urlHint.classList.add('hidden');
+  urlHint.textContent = '';
 };
