@@ -86,11 +86,11 @@ export const openDialog = (linkId, prefill = {}) => {
 
   dialogBackdrop.classList.remove('hidden');
   checkDuplicate();
-  // Focus the first empty field: Page if name is pre-filled, otherwise Name
-  if (prefill.name) {
-    categoryInput.focus();
-  } else {
+  // Focus Link if empty (normal add), Name if Link is pre-filled (share case)
+  if (prefill.url) {
     nameInput.focus();
+  } else {
+    urlInput.focus();
   }
 };
 
