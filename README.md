@@ -79,7 +79,8 @@ The steps below are verified on iOS/iPadOS/macOS 26.
    ```
    https://cbolik.github.io/Quicklinks/?add=
    ```
-   After the `=`, insert the **URL Encoded Text** output from Action 1
+   After the `=`, insert the **URL Encoded Text** output from Action 1.
+   *(If you self-host, replace the URL with your own GitHub Pages URL.)*
 
    **Action 3 — Open**
    Set to the **Text** output from Action 2
@@ -115,12 +116,14 @@ On macOS, `spotify:` URIs are used directly with an 800ms fallback to the web pl
 
 ## Self-hosting
 
-No build step required. It's three files.
+No build step required. It's a handful of static files.
 
-1. **Fork or clone this repo**
+1. **Fork this repo** and note your new GitHub Pages URL (e.g. `https://your-username.github.io/Quicklinks/`)
 2. **Enable GitHub Pages** (Settings → Pages → Deploy from branch `main`)
-3. **Add to your iPhone home screen** (Share → Add to Home Screen) for a full-screen launcher experience
+3. **Add to your iPhone home screen** (Share → Add to Home Screen) for a launcher experience
 4. **Moving to a new device:** use **⋮ → Export** on your old device to save a backup, then **⋮ → Import** (or the Import button on the empty-state screen) on the new one. Links are stored in `localStorage` and don't sync automatically.
+
+> **If you set up the iOS Shortcut:** update the URL in the Text action to your own GitHub Pages URL (replace `cbolik.github.io/Quicklinks` with your URL).
 
 That's it. Your links never appear in the repo.
 
