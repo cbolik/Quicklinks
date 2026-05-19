@@ -86,8 +86,12 @@ export const openDialog = (linkId, prefill = {}) => {
 
   dialogBackdrop.classList.remove('hidden');
   checkDuplicate();
-  // Always focus the first field (Page); if name is also pre-filled, it's the only empty one anyway
-  categoryInput.focus();
+  // Focus the first empty field: Page if name is pre-filled, otherwise Name
+  if (prefill.name) {
+    categoryInput.focus();
+  } else {
+    nameInput.focus();
+  }
 };
 
 export const closeDialog = () => {
