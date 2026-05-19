@@ -199,10 +199,19 @@ initPagesEditor({ pagesBackdrop }, render);
 initMenu({ menuBtn, menuDropdown, importFileInput }, { openDialog, onRender: render });
 
 // --- Share-target: ?add=<url>&title=<name> ---
+
+// Some apps (e.g. Calm) share plain text containing a URL rather than a bare URL.
+// Extract the first http(s) URL from the value; fall back to the raw string if none found.
+const extractUrl = (text) => {
+  const m = text.match(/https?:\/\/\S+/);
+  return m ? m[0] : text.trim();
+};
+
 const applyShareParams = () => {
   const params = new URLSearchParams(window.location.search);
-  const url = params.get('add');
-  if (!url) return;
+  const raw = params.get('add');
+  if (!raw) return;
+  const url = extractUrl(raw);
   const name = params.get('title') ?? '';
   // Strip params immediately so a page reload doesn't re-open the dialog
   history.replaceState(null, '', window.location.pathname);
